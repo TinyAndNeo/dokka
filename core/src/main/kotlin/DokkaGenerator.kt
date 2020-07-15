@@ -82,7 +82,7 @@ class DokkaGenerator(
     fun mergeDocumentationModels(
         modulesFromPlatforms: List<DModule>,
         context: DokkaContext
-    ) = context.single(CoreExtensions.documentableMerger).invoke(modulesFromPlatforms, context)
+    ) = context.single(CoreExtensions.documentableMerger).invoke(modulesFromPlatforms)
 
     fun transformDocumentationModelAfterMerge(
         documentationModel: DModule,

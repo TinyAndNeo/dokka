@@ -196,7 +196,7 @@ abstract class AbstractCoreTest(
     protected class DokkaSourceSetBuilder(
         var moduleName: String = "root",
         var moduleDisplayName: String? = null,
-        var name: String = "main",
+        var sourceSetName: String = "main",
         var displayName: String = "JVM",
         var classpath: List<String> = emptyList(),
         var sourceRoots: List<String> = emptyList(),
