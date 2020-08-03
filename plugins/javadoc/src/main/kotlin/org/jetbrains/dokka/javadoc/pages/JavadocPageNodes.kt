@@ -15,6 +15,7 @@ import org.jetbrains.dokka.pages.*
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.resolve.DescriptorUtils.getClassDescriptorForType
+import java.util.*
 
 interface JavadocPageNode : ContentPage
 
@@ -24,7 +25,7 @@ interface WithJavadocExtra<T : Documentable> : WithExtraProperties<T> {
 }
 
 interface WithIndexables {
-    fun getAllIndexables(): List<IndexableJavadocNode>
+    fun getAllIndexables(): List<NavigableJavadocNode>
 }
 
 interface WithBrief {
@@ -35,15 +36,18 @@ class JavadocModulePageNode(
     override val name: String,
     override val content: JavadocContentNode,
     override val children: List<PageNode>,
-    override val dri: Set<DRI>
+    override val dri: Set<DRI>,
+    override val extra: PropertyContainer<DModule> = PropertyContainer.empty()
 ) :
     RootPageNode(),
+    WithJavadocExtra<DModule>,
+    NavigableJavadocNode,
     JavadocPageNode {
 
     override val documentable: Documentable? = null
     override val embeddedResources: List<String> = emptyList()
     override fun modified(name: String, children: List<PageNode>): RootPageNode =
-        JavadocModulePageNode(name, content, children, dri)
+        JavadocModulePageNode(name, content, children, dri, extra)
 
     override fun modified(
         name: String,
@@ -51,7 +55,11 @@ class JavadocModulePageNode(
         dri: Set<DRI>,
         embeddedResources: List<String>,
         children: List<PageNode>
-    ): ContentPage = JavadocModulePageNode(name, content as JavadocContentNode, children, dri)
+    ): ContentPage = JavadocModulePageNode(name, content as JavadocContentNode, children, dri, extra)
+
+    override fun getId(): String = name
+
+    override fun getDRI(): DRI = dri.first()
 }
 
 class JavadocPackagePageNode(
@@ -62,10 +70,12 @@ class JavadocPackagePageNode(
     override val documentable: Documentable? = null,
     override val children: List<PageNode> = emptyList(),
     override val embeddedResources: List<String> = listOf()
-) : JavadocPageNode, WithIndexables {
+) : JavadocPageNode,
+    NavigableJavadocNode,
+    WithIndexables {
 
-    override fun getAllIndexables(): List<IndexableJavadocNode> =
-        children.filterIsInstance<IndexableJavadocNode>().flatMap {
+    override fun getAllIndexables(): List<NavigableJavadocNode> =
+        children.filterIsInstance<NavigableJavadocNode>().flatMap {
             if (it is WithIndexables) it.getAllIndexables()
             else listOf(it)
         }
@@ -97,14 +107,18 @@ class JavadocPackagePageNode(
             children,
             embeddedResources
         )
+
+    override fun getId(): String = name
+
+    override fun getDRI(): DRI = dri.first()
 }
 
-interface IndexableJavadocNode {
+interface NavigableJavadocNode {
     fun getId(): String
     fun getDRI(): DRI
 }
 
-sealed class AnchorableJavadocNode(open val name: String, open val dri: DRI) : IndexableJavadocNode {
+sealed class AnchorableJavadocNode(open val name: String, open val dri: DRI) : NavigableJavadocNode {
     override fun getId(): String = name
     override fun getDRI(): DRI = dri
 }
@@ -168,9 +182,9 @@ class JavadocClasslikePageNode(
     override val children: List<PageNode> = emptyList(),
     override val embeddedResources: List<String> = listOf(),
     override val extra: PropertyContainer<DClasslike> = PropertyContainer.empty(),
-) : JavadocPageNode, WithJavadocExtra<DClasslike>, IndexableJavadocNode, WithIndexables, WithBrief {
+) : JavadocPageNode, WithJavadocExtra<DClasslike>, NavigableJavadocNode, WithIndexables, WithBrief {
 
-    override fun getAllIndexables(): List<IndexableJavadocNode> =
+    override fun getAllIndexables(): List<NavigableJavadocNode> =
         methods + entries + classlikes.map { it.getAllIndexables() }.flatten() + this
 
     val kind: String? = documentable?.kind()
@@ -258,9 +272,60 @@ class AllClassesPage(val classes: List<JavadocClasslikePageNode>) : JavadocPageN
 
 }
 
+class DeprecatedPage(
+    val elements: IdentityHashMap<DeprecatedPageSection, MutableSet<DeprecatedNode>>,
+    sourceSet: Set<DokkaConfiguration.DokkaSourceSet>
+) : JavadocPageNode {
+    override val name: String = "deprecated"
+    override val dri: Set<DRI> = setOf(DRI.topLevel)
+    override val documentable: Documentable? = null
+    override val children: List<PageNode> = emptyList()
+    override val embeddedResources: List<String> = listOf()
+
+    override val content: ContentNode = EmptyNode(
+        DRI.topLevel,
+        ContentKind.Main,
+        sourceSet
+    )
+
+    override fun modified(
+        name: String,
+        children: List<PageNode>
+    ): PageNode =
+        TODO()
+
+    override fun modified(
+        name: String,
+        content: ContentNode,
+        dri: Set<DRI>,
+        embeddedResources: List<String>,
+        children: List<PageNode>
+    ): ContentPage =
+        TODO()
+
+}
+
+class DeprecatedNode(val name: String, val address: DRI, val description: List<ContentNode>) {
+    override fun equals(other: Any?): Boolean =
+        (other as? DeprecatedNode)?.address == address
+
+    override fun hashCode(): Int = address.hashCode()
+}
+
+sealed class DeprecatedPageSection(val id: String, val caption: String, val header: String, val priority: Int = 100)
+object DeprecatedForRemoval : DeprecatedPageSection("forRemoval", "For Removal", "Element", priority = 90)
+object DeprecatedModules: DeprecatedPageSection("module", "Modules", "Module")
+object DeprecatedInterfaces : DeprecatedPageSection("interface", "Interfaces", "Interface")
+object DeprecatedClasses : DeprecatedPageSection("class", "Classes", "Class")
+object DeprecatedEnums: DeprecatedPageSection("enum", "Enums", "Enum")
+object DeprecatedFields: DeprecatedPageSection("field", "Fields", "Field")
+object DeprecatedMethods : DeprecatedPageSection("method", "Methods", "Method")
+object DeprecatedConstructors : DeprecatedPageSection("constructor", "Constructors", "Constructor")
+object DeprecatedEnumConstants : DeprecatedPageSection("enum.constant", "Enum Constants", "Enum Constant")
+
 class IndexPage(
     val id: Int,
-    val elements: List<IndexableJavadocNode>,
+    val elements: List<NavigableJavadocNode>,
     val keys: List<Char>,
     sourceSet: Set<DokkaConfiguration.DokkaSourceSet>
 

@@ -18,8 +18,6 @@ import org.jetbrains.dokka.plugability.plugin
 import org.jetbrains.dokka.plugability.querySingle
 import org.jetbrains.dokka.renderers.Renderer
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
-import java.nio.file.Path
-import java.nio.file.Paths
 import java.time.LocalDate
 
 typealias TemplateMap = Map<String, Any?>
@@ -51,6 +49,7 @@ class KorteJavadocRenderer(private val outputWriter: OutputWriter, val context: 
         is AllClassesPage -> "listPage.korte"
         is TreeViewPage -> "treePage.korte"
         is IndexPage -> "indexPage.korte"
+        is DeprecatedPage -> "deprecated.korte"
         else -> ""
     }
 
