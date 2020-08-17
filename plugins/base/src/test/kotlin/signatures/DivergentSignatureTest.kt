@@ -16,14 +16,14 @@ class DivergentSignatureTest : AbstractCoreTest() {
         sourceSets {
             val common = sourceSet {
                 moduleName = "example"
-                sourceSetName = "common"
+                name = "common"
                 displayName = "common"
                 analysisPlatform = "common"
                 sourceRoots = listOf(Paths.get("$testDataDir/commonMain/kotlin").toString())
             }
             val jvmAndJsSecondCommonMain = sourceSet {
                 moduleName = "example"
-                sourceSetName = "jvmAndJsSecondCommonMain"
+                name = "jvmAndJsSecondCommonMain"
                 displayName = "jvmAndJsSecondCommonMain"
                 analysisPlatform = "common"
                 dependentSourceSets = setOf(common.sourceSetID)
@@ -31,7 +31,7 @@ class DivergentSignatureTest : AbstractCoreTest() {
             }
             val js = sourceSet {
                 moduleName = "example"
-                sourceSetName = "js"
+                name = "js"
                 displayName = "js"
                 analysisPlatform = "js"
                 dependentSourceSets = setOf(common.sourceSetID, jvmAndJsSecondCommonMain.sourceSetID)
@@ -39,7 +39,7 @@ class DivergentSignatureTest : AbstractCoreTest() {
             }
             val jvm = sourceSet {
                 moduleName = "example"
-                sourceSetName = "jvm"
+                name = "jvm"
                 displayName = "jvm"
                 analysisPlatform = "jvm"
                 dependentSourceSets = setOf(common.sourceSetID, jvmAndJsSecondCommonMain.sourceSetID)

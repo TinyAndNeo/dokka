@@ -26,22 +26,37 @@ class LinkableContentTest : AbstractCoreTest() {
 
         val configuration = dokkaConfiguration {
             sourceSets {
-                sourceSet {
+                val common = sourceSet {
                     moduleName = "example"
+                    name = "common"
+                    displayName = "common"
+                    analysisPlatform = "common"
+                    sourceRoots = listOf(Paths.get("$testDataDir/commonMain/kotlin").toString())
+                }
+                val jvmAndJsSecondCommonMain = sourceSet {
+                    moduleName = "example"
+                    name = "jvmAndJsSecondCommonMain"
+                    displayName = "jvmAndJsSecondCommonMain"
+                    analysisPlatform = "common"
+                    dependentSourceSets = setOf(common.sourceSetID)
+                    sourceRoots = listOf(Paths.get("$testDataDir/jvmAndJsSecondCommonMain/kotlin").toString())
+                }
+                val js = sourceSet {
+                    moduleName = "example"
+                    name = "js"
+                    displayName = "js"
                     analysisPlatform = "js"
-                    sourceRoots = listOf("jsMain", "commonMain", "jvmAndJsSecondCommonMain").map {
-                        Paths.get("$testDataDir/$it/kotlin").toString()
-                    }
-                    sourceSetName = "js"
+                    dependentSourceSets = setOf(common.sourceSetID, jvmAndJsSecondCommonMain.sourceSetID)
+                    sourceRoots = listOf(Paths.get("$testDataDir/jsMain/kotlin").toString())
                     includes = listOf(Paths.get("$includesDir/include2.md").toString())
                 }
-                sourceSet {
+                val jvm = sourceSet {
                     moduleName = "example"
+                    name = "jvm"
+                    displayName = "jvm"
                     analysisPlatform = "jvm"
-                    sourceRoots = listOf("jvmMain", "commonMain", "jvmAndJsSecondCommonMain").map {
-                        Paths.get("$testDataDir/$it/kotlin").toString()
-                    }
-                    sourceSetName = "jvm"
+                    dependentSourceSets = setOf(common.sourceSetID, jvmAndJsSecondCommonMain.sourceSetID)
+                    sourceRoots = listOf(Paths.get("$testDataDir/jvmMain/kotlin").toString())
                     includes = listOf(Paths.get("$includesDir/include1.md").toString())
                 }
             }
@@ -65,10 +80,28 @@ class LinkableContentTest : AbstractCoreTest() {
 
         val configuration = dokkaConfiguration {
             sourceSets {
-                sourceSet {
+                val common = sourceSet {
                     moduleName = "example"
+                    name = "common"
+                    displayName = "common"
+                    analysisPlatform = "common"
+                    sourceRoots = listOf(Paths.get("$testDataDir/commonMain/kotlin").toString())
+                }
+                val jvmAndJsSecondCommonMain = sourceSet {
+                    moduleName = "example"
+                    name = "jvmAndJsSecondCommonMain"
+                    displayName = "jvmAndJsSecondCommonMain"
+                    analysisPlatform = "common"
+                    dependentSourceSets = setOf(common.sourceSetID)
+                    sourceRoots = listOf(Paths.get("$testDataDir/jvmAndJsSecondCommonMain/kotlin").toString())
+                }
+                val js = sourceSet {
+                    moduleName = "example"
+                    name = "js"
+                    displayName = "js"
                     analysisPlatform = "js"
-                    sourceRoots = listOf("$testDataDir/jsMain/kotlin")
+                    dependentSourceSets = setOf(common.sourceSetID, jvmAndJsSecondCommonMain.sourceSetID)
+                    sourceRoots = listOf(Paths.get("$testDataDir/jsMain/kotlin").toString())
                     sourceLinks = listOf(
                         SourceLinkDefinitionImpl(
                             localDirectory = "jsMain/kotlin",
@@ -76,12 +109,14 @@ class LinkableContentTest : AbstractCoreTest() {
                             remoteLineSuffix = "#L"
                         )
                     )
-                    sourceSetName = "js"
                 }
-                sourceSet {
+                val jvm = sourceSet {
                     moduleName = "example"
+                    name = "jvm"
+                    displayName = "jvm"
                     analysisPlatform = "jvm"
-                    sourceRoots = listOf("$testDataDir/jvmMain/kotlin")
+                    dependentSourceSets = setOf(common.sourceSetID, jvmAndJsSecondCommonMain.sourceSetID)
+                    sourceRoots = listOf(Paths.get("$testDataDir/jvmMain/kotlin").toString())
                     sourceLinks = listOf(
                         SourceLinkDefinitionImpl(
                             localDirectory = "jvmMain/kotlin",
@@ -89,7 +124,6 @@ class LinkableContentTest : AbstractCoreTest() {
                             remoteLineSuffix = "#L"
                         )
                     )
-                    sourceSetName = "jvm"
                 }
             }
         }
@@ -130,18 +164,37 @@ class LinkableContentTest : AbstractCoreTest() {
 
         val configuration = dokkaConfiguration {
             sourceSets {
-                sourceSet {
+                val common = sourceSet {
                     moduleName = "example"
+                    name = "common"
+                    displayName = "common"
+                    analysisPlatform = "common"
+                    sourceRoots = listOf(Paths.get("$testDataDir/commonMain/kotlin").toString())
+                }
+                val jvmAndJsSecondCommonMain = sourceSet {
+                    moduleName = "example"
+                    name = "jvmAndJsSecondCommonMain"
+                    displayName = "jvmAndJsSecondCommonMain"
+                    analysisPlatform = "common"
+                    dependentSourceSets = setOf(common.sourceSetID)
+                    sourceRoots = listOf(Paths.get("$testDataDir/jvmAndJsSecondCommonMain/kotlin").toString())
+                }
+                val js = sourceSet {
+                    moduleName = "example"
+                    name = "js"
+                    displayName = "js"
                     analysisPlatform = "js"
-                    sourceRoots = listOf("$testDataDir/jsMain/kotlin")
-                    sourceSetName = "js"
+                    dependentSourceSets = setOf(common.sourceSetID, jvmAndJsSecondCommonMain.sourceSetID)
+                    sourceRoots = listOf(Paths.get("$testDataDir/jsMain/kotlin").toString())
                     samples = listOf("$testDataDir/jsMain/resources/Samples.kt")
                 }
-                sourceSet {
+                val jvm = sourceSet {
                     moduleName = "example"
+                    name = "jvm"
+                    displayName = "jvm"
                     analysisPlatform = "jvm"
-                    sourceRoots = listOf("$testDataDir/jvmMain/kotlin")
-                    sourceSetName = "jvm"
+                    dependentSourceSets = setOf(common.sourceSetID, jvmAndJsSecondCommonMain.sourceSetID)
+                    sourceRoots = listOf(Paths.get("$testDataDir/jvmMain/kotlin").toString())
                     samples = listOf("$testDataDir/jvmMain/resources/Samples.kt")
                 }
             }
@@ -202,7 +255,7 @@ class LinkableContentTest : AbstractCoreTest() {
                     sourceSet {
                         sourceRoots = listOf("src/")
                         analysisPlatform = "jvm"
-                        sourceSetName = "js"
+                        name = "js"
                     }
                 }
             }

@@ -132,14 +132,14 @@ class PageNodeMergerTest : AbstractCoreTest() {
             sourceSets {
                 val common = sourceSet {
                     moduleName = "example"
-                    sourceSetName = "common"
+                    name = "common"
                     displayName = "common"
                     analysisPlatform = "common"
                     sourceRoots = listOf("src/commonMain/kotlin/pageMerger/Test.kt")
                 }
                 val js = sourceSet {
                     moduleName = "example"
-                    sourceSetName = "js"
+                    name = "js"
                     displayName = "js"
                     analysisPlatform = "js"
                     dependentSourceSets = setOf(common.sourceSetID)
@@ -147,7 +147,7 @@ class PageNodeMergerTest : AbstractCoreTest() {
                 }
                 val jvm = sourceSet {
                     moduleName = "example"
-                    sourceSetName = "jvm"
+                    name = "jvm"
                     displayName = "jvm"
                     analysisPlatform = "jvm"
                     dependentSourceSets = setOf(common.sourceSetID)
