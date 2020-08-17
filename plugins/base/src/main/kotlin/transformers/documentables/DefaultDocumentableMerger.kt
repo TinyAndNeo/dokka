@@ -159,7 +159,7 @@ internal class DefaultDocumentableMerger(context: DokkaContext) : DocumentableMe
         this is DInterface && other is DInterface -> mergeWith(other)
         this is DObject && other is DObject -> mergeWith(other)
         this is DAnnotation && other is DAnnotation -> mergeWith(other)
-        else -> throw IllegalStateException("${this::class.qualifiedName} ${this.name} cannot be mergesd with ${other::class.qualifiedName} ${other.name}")
+        else -> throw IllegalStateException("${this::class.qualifiedName} ${this.name} cannot be merged with ${other::class.qualifiedName} ${other.name}")
     }
 
     fun DClass.mergeWith(other: DClass): DClass = copy(
